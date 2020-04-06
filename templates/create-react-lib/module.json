@@ -1,0 +1,6 @@
+{
+    "name":"{{name}}",
+    "label":"A readable module name",
+    "desc":"Short description of module",
+    "_id":"{{id}}"
+}
