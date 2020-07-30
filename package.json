@@ -16,6 +16,6 @@
     "md5-file": "^5.0.0",
     "minimist": "^1.2.5",
     "request": "^2.88.2",
-    "s3": "^4.4.0"
+    "s3": "git+https://github.com/noodlapp/node-s3-client.git"
   }
 }
