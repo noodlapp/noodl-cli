@@ -263,7 +263,26 @@ function CreateReactLib(args) {
 }
 
 function CreateLib(args) {
+    const dir = argv._[1];
+    if(!dir) return console.log('Must specify target directory name')
 
+    if(fs.existsSync(dir)) return console.log(`Directory ${dir} already exists.`)
+
+    try {
+        fs.mkdirSync(dir);
+
+        const template = __dirname + '/templates/create-lib/.';
+        fse.copySync(template,dir);
+    }
+    catch(e) {
+        console.log('Failed to initialize from template',e);
+    }
+
+    if(!args.name) args.name = dir.replace(/\s+/g, '-').toLowerCase();
+    args.id = guid() + '-' + args.name;
+
+    updateTemplateFile(dir + '/module/package.json',args);
+    updateTemplateFile(dir + '/module.json',args);
 }
 
 function UpdateDesc(args) {
