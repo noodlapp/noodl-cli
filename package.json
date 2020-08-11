@@ -1,5 +1,5 @@
 {
-  "name": "noodl-cli",
+  "name": "@noodl/noodl-cli",
   "version": "0.3.0",
   "description": "Noodl CLI",
   "main": "index.js",
