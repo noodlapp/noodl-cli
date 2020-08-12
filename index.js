@@ -298,6 +298,7 @@ function UpdateDesc(args) {
 
     module.label = args.label || module.label;
     module.desc = args.desc || module.desc;
+    module.docs = args.docs || module.docs;
 
     fs.writeFileSync('module.json',JSON.stringify(module,null,2));
 }
@@ -359,6 +360,7 @@ async function UploadLib(args) {
     lib.desc = module.desc;
     lib.url = domain.resourcesEndpoint + '/' + keys.prefix + 'library/' + archive;
     lib.thumbURL = domain.resourcesEndpoint + '/' + keys.prefix + 'library/' + module.name + '-icon.png';
+    lib.docs = module.docs;
 
     await putConfig(userConfig);
 }
