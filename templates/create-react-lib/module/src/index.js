@@ -1,3 +1,5 @@
+const Noodl = require('@noodl/noodl-sdk');
+
 function MyCustomReactComponent(props) {
 	const style = {
 		color: props.textColor,
@@ -10,7 +12,7 @@ function MyCustomReactComponent(props) {
 	return <div style={style} onClick={props.onClick} >{props.children}</div>
 }
 
-const MyCustomReactComponentNode = {
+const MyCustomReactComponentNode = Noodl.defineReactNode({
 	name: 'Custom React Component',
 	category: 'Tutorial',
 	getReactComponent() {
@@ -23,7 +25,7 @@ const MyCustomReactComponentNode = {
 	outputProps: {
 		onClick: {type: 'signal', displayName: 'Click'}
 	}
-}
+})
 
 
 Noodl.defineModule({
