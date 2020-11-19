@@ -260,6 +260,8 @@ function CreateReactLib(args) {
 
     updateTemplateFile(dir + '/module/package.json',args);
     updateTemplateFile(dir + '/module.json',args);
+
+    console.log('Success');
 }
 
 function CreateLib(args) {
@@ -283,6 +285,8 @@ function CreateLib(args) {
 
     updateTemplateFile(dir + '/module/package.json',args);
     updateTemplateFile(dir + '/module.json',args);
+
+    console.log('Success');
 }
 
 function UpdateDesc(args) {
@@ -301,6 +305,8 @@ function UpdateDesc(args) {
     module.docs = args.docs || module.docs;
 
     fs.writeFileSync('module.json',JSON.stringify(module,null,2));
+
+    console.log('Success');
 }
 
 async function UploadLib(args) {
@@ -363,6 +369,59 @@ async function UploadLib(args) {
     lib.docs = module.docs;
 
     await putConfig(userConfig);
+
+    console.log('Success');
+}
+
+async function RemoveLib(args) {
+    if(!args.workspace) return console.log('Must provide workspace name with --workspace "workspace-name". ')
+
+    if(!args.accessKey) return console.log('Must provide workspace access key with --accessKey "XYZ". ')
+
+    try {
+        domain = await getDomainInfo(args.workspace);
+
+        keys = await getWorkspaceCredentials(args.workspace, domain, args.accessKey);
+    }
+    catch (e) {
+        console.log('Could not get workspace (' + args.workspace + ') credentials, is the access key correct?');
+        return;
+    }
+
+    try {
+        module = JSON.parse(fs.readFileSync('module.json'));
+    }
+    catch (e) {
+        console.log('Could not read module config file.');
+        return;
+    }
+
+    try {
+        var userConfig = await getJSONObject({ bucket: keys.bucket, key: keys.prefix + 'config.json' });
+        userConfig = userConfig.config;
+    }
+    catch (e) {
+        console.log('Could not retrieve config from workspace.');
+        console.log(e);
+        return;
+    }
+
+    if(userConfig.library === undefined) {
+        console.log('Workspace has no library.');
+        return;
+    }
+
+    var libIdx = userConfig.library.findIndex((l) => l._id === module._id)
+    if(libIdx === -1) {
+        console.log('Module is not part of this workspace library.')
+        return;
+    }
+
+    userConfig.library.splice(libIdx,1);
+
+    await putConfig(userConfig);
+
+    console.log('Success');
 }
 
 const commands = {
@@ -370,6 +429,7 @@ const commands = {
     'create-lib':CreateLib,
     'push':UploadLib,
     'desc':UpdateDesc,
+    'remove':RemoveLib
 }
 
 var argv = require('minimist')(process.argv.slice(2))
