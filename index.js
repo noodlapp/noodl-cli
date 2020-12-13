@@ -7,6 +7,9 @@ const request = require('request');
 const archiver = require('archiver');
 const md5File = require('md5-file');
 
+var authEndpoint = "https://api1.noodlapp.com/auth"
+var domainTemplateName = 'template-beta'
+
 function guid() {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -85,11 +88,11 @@ function getDomainInfo(domain) {
     })
 }
 
-function getWorkspaceCredentials(name, domain, key) {
+function getWorkspaceCredentials(name, key) {
     return new Promise(function (resolve, reject) {
         request({
             method: 'GET',
-            url: domain.authEndpoint + '/workspace/' + encodeURIComponent(name) + '/credentials',
+            url: authEndpoint + '/workspace/' + encodeURIComponent(name) + '/credentials',
             headers: {
                 'Authorization': key
             }
@@ -310,17 +313,21 @@ function UpdateDesc(args) {
 }
 
 async function UploadLib(args) {
-    if(!args.workspace) return console.log('Must provide workspace name with --workspace "workspace-name". ')
-
     if(!args.accessKey) return console.log('Must provide workspace access key with --accessKey "XYZ". ')
 
-    try {
-        domain = await getDomainInfo(args.workspace);
+    const _parts = args.accessKey.split('/');
+    const workspaceId = _parts[0];
+    const accessKey = _parts[1];
+    if(accessKey === undefined || workspaceId === undefined) 
+        return console.log('Malformed access key');
 
-        keys = await getWorkspaceCredentials(args.workspace, domain, args.accessKey);
+    try {
+        domain = await getDomainInfo(domainTemplateName);
+
+        keys = await getWorkspaceCredentials(workspaceId, accessKey);
     }
     catch (e) {
-        console.log('Could not get workspace (' + args.workspace + ') credentials, is the access key correct?');
+        console.log('Could not get workspace credentials, is the access key correct?');
         return;
     }
 
@@ -374,17 +381,19 @@ async function UploadLib(args) {
 }
 
 async function RemoveLib(args) {
-    if(!args.workspace) return console.log('Must provide workspace name with --workspace "workspace-name". ')
-
     if(!args.accessKey) return console.log('Must provide workspace access key with --accessKey "XYZ". ')
 
-    try {
-        domain = await getDomainInfo(args.workspace);
+    const _parts = args.accessKey.split('/');
+    const workspaceId = _parts[0];
+    const accessKey = _parts[1];
+    if(accessKey === undefined || workspaceId === undefined) 
+        return console.log('Malformed access key');
 
-        keys = await getWorkspaceCredentials(args.workspace, domain, args.accessKey);
+    try {
+        keys = await getWorkspaceCredentials(workspaceId, accessKey);
     }
     catch (e) {
-        console.log('Could not get workspace (' + args.workspace + ') credentials, is the access key correct?');
+        console.log('Could not get workspace credentials, is the access key correct?');
         return;
     }
 
@@ -434,6 +443,13 @@ const commands = {
 
 var argv = require('minimist')(process.argv.slice(2))
 const cmd = argv._[0];
+
+if(argv.dev === true) {
+    // Switch to dev backend
+    authEndpoint = "https://api2.noodlapp.com/auth"
+    domainTemplateName = 'template-dev'
+}
+
 if(!commands[cmd]) {
     console.log('Unknown command');
 }
