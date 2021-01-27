@@ -1,6 +1,6 @@
 {
   "name": "@noodl/noodl-cli",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Noodl CLI",
   "main": "index.js",
   "bin": "./index.js",
