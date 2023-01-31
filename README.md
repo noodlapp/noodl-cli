@@ -6,7 +6,7 @@
 
 
 ```shell
-$ npm install -g noodl-cli
+$ npm install -g @noodl/noodl-cli
 ```
 
 
